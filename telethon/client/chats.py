@@ -96,7 +96,7 @@ class _ChatAction:
 
 
 class _ParticipantsIter(RequestIter):
-    async def _init(self, entity, filter, search, aggressive, offset):
+    async def _init(self, entity, filter, search, aggressive, offset, fetch_total):
         if isinstance(filter, type):
             if filter in (types.ChannelParticipantsBanned,
                           types.ChannelParticipantsKicked,
@@ -126,7 +126,7 @@ class _ParticipantsIter(RequestIter):
         if ty == helpers._EntityType.CHANNEL:
             self.total = (await self.client(
                 functions.channels.GetFullChannelRequest(entity)
-            )).full_chat.participants_count
+            )).full_chat.participants_count if fetch_total else None
 
             if self.limit <= 0:
                 raise StopAsyncIteration
@@ -383,7 +383,8 @@ class ChatMethods:
             search: str = '',
             filter: 'types.TypeChannelParticipantsFilter' = None,
             aggressive: bool = False,
-            offset: int = 0) -> _ParticipantsIter:
+            offset: int = 0,
+            fetch_total: bool = False) -> _ParticipantsIter:
         """
         Iterator over the participants belonging to the specified chat.
 
@@ -452,7 +453,8 @@ class ChatMethods:
             filter=filter,
             search=search,
             aggressive=aggressive,
-            offset=offset
+            offset=offset,
+            fetch_total=fetch_total
         )
 
     async def get_participants(
