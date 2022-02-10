@@ -96,7 +96,7 @@ class _ChatAction:
 
 
 class _ParticipantsIter(RequestIter):
-    async def _init(self, entity, filter, search, aggressive):
+    async def _init(self, entity, filter, search, aggressive, offset):
         if isinstance(filter, type):
             if filter in (types.ChannelParticipantsBanned,
                           types.ChannelParticipantsKicked,
@@ -144,7 +144,7 @@ class _ParticipantsIter(RequestIter):
                 self.requests.append(functions.channels.GetParticipantsRequest(
                     channel=entity,
                     filter=filter or types.ChannelParticipantsSearch(search),
-                    offset=0,
+                    offset=offset,
                     limit=_MAX_PARTICIPANTS_CHUNK_SIZE,
                     hash=0
                 ))
@@ -382,7 +382,8 @@ class ChatMethods:
             *,
             search: str = '',
             filter: 'types.TypeChannelParticipantsFilter' = None,
-            aggressive: bool = False) -> _ParticipantsIter:
+            aggressive: bool = False,
+            offset: int = 0) -> _ParticipantsIter:
         """
         Iterator over the participants belonging to the specified chat.
 
@@ -450,7 +451,8 @@ class ChatMethods:
             entity=entity,
             filter=filter,
             search=search,
-            aggressive=aggressive
+            aggressive=aggressive,
+            offset=offset
         )
 
     async def get_participants(
